@@ -39,6 +39,7 @@ cp .env.local .env.local
 Edit `.env.local`:
 ```
 ANTHROPIC_API_KEY=sk-ant-...
+GROQ_API_KEY=your-groq-api-key
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
