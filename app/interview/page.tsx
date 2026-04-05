@@ -1,8 +1,12 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+
+function InterviewContent() {
+  const params      = useSearchParams()
+  const candidateId = params.get('candidate_id')
 
 interface Message {
   role: 'assistant' | 'candidate'
@@ -23,10 +27,6 @@ interface Session {
   eval_summary?: string
 }
 
-export default function InterviewPage() {
-  const params      = useSearchParams()
-  const candidateId = params.get('candidate_id')
-
   const [session,   setSession]   = useState<Session | null>(null)
   const [messages,  setMessages]  = useState<Message[]>([])
   const [input,     setInput]     = useState('')
@@ -44,6 +44,7 @@ export default function InterviewPage() {
   }, [messages])
 
   async function fetchCandidate() {
+    if (!candidateId) return
     const res  = await fetch(`/api/score?candidate_id=${candidateId}`)
     // also fetch basic info
     const res2 = await fetch(`/api/interview?candidate_id=${candidateId}`)
@@ -200,5 +201,13 @@ export default function InterviewPage() {
 
       <style>{`@keyframes pulse { 0%,80%,100%{opacity:.2} 40%{opacity:1} }`}</style>
     </div>
+  )
+}
+
+export default function InterviewPage() {
+  return (
+    <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>Loading interview...</div>}>
+      <InterviewContent />
+    </Suspense>
   )
 }

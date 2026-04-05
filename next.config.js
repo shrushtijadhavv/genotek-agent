@@ -1,8 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    serverComponentsExternalPackages: ['csv-parse'],
-  },
+  serverExternalPackages: ['csv-parse'],
 }
 
 module.exports = nextConfig
