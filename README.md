@@ -190,9 +190,9 @@ npm run start
 
 ---
 
-## Internshala CSV format
+## CSV format
 
-Internshala employer exports use these column names (adjust in `lib/ingest.ts` if yours differ):
+employer exports use these column names (adjust in `lib/ingest.ts` if yours differ):
 - `Name`
 - `Email`  
 - `Phone`
