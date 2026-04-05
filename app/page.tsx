@@ -42,6 +42,8 @@ export default function Dashboard() {
   const [batchRunning, setBatch]        = useState(false)
   const [msg,          setMsg]          = useState('')
   const [actionMsg,    setActionMsg]    = useState('')
+  const [showConfirm,  setShowConfirm]  = useState(false)
+  const [deleting,     setDeleting]     = useState(false)
 
   async function load() {
     setLoading(true)
@@ -82,6 +84,32 @@ export default function Dashboard() {
     load()
   }
 
+  async function deleteAll() {
+    setDeleting(true)
+    const res = await fetch('/api/candidates', { method: 'DELETE' })
+    if (res.ok) {
+      setShowConfirm(false)
+      setMsg('All candidates deleted.')
+      setTimeout(() => setMsg(''), 4000)
+      load()
+    }
+    setDeleting(false)
+  }
+
+  async function deleteOne(id: string) {
+    await fetch(`/api/candidates?id=${id}`, { method: 'DELETE' })
+    load()
+  }
+
+  async function resetStatus(id: string) {
+    await fetch('/api/candidates', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, status: 'pending', score: null }),
+    })
+    load()
+  }
+
   async function updateStatus(candidateId: string, decision: 'hired' | 'rejected') {
     const res = await fetch('/api/outcomes', {
       method:  'POST',
@@ -116,6 +144,12 @@ export default function Dashboard() {
           <Link href="/ingest" style={{ padding: '8px 16px', border: '1px solid #ddd', borderRadius: 8, textDecoration: 'none', color: '#333', fontSize: 14 }}>
             Import candidates
           </Link>
+          <button
+            onClick={() => setShowConfirm(true)}
+            style={{ padding: '8px 16px', border: '1px solid #fca5a5', borderRadius: 8, background: '#fef2f2', color: '#991b1b', fontSize: 14, cursor: 'pointer' }}
+          >
+            Reset all
+          </button>
           <button
             onClick={runBatchScore}
             disabled={batchRunning}
@@ -289,6 +323,20 @@ export default function Dashboard() {
                     {c.status === 'rejected' && (
                       <span style={{ fontSize: 12, padding: '5px 10px', background: '#fef2f2', color: '#991b1b', borderRadius: 6, border: '1px solid #fca5a5' }}>✗ Rejected</span>
                     )}
+                    <button
+                      onClick={() => resetStatus(c.id)}
+                      title="Reset to pending"
+                      style={{ fontSize: 11, padding: '5px 8px', border: '1px solid #ddd', borderRadius: 6, background: 'transparent', cursor: 'pointer', color: '#888' }}
+                    >
+                      ↺ Reset
+                    </button>
+                    <button
+                      onClick={() => deleteOne(c.id)}
+                      title="Delete this candidate"
+                      style={{ fontSize: 11, padding: '5px 8px', border: '1px solid #fca5a5', borderRadius: 6, background: '#fef2f2', cursor: 'pointer', color: '#991b1b' }}
+                    >
+                      🗑
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -296,6 +344,32 @@ export default function Dashboard() {
           </tbody>
         </table>
       </div>
+      {/* Confirm delete all modal */}
+      {showConfirm && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50 }}>
+          <div style={{ background: '#fff', borderRadius: 16, padding: '2rem', maxWidth: 400, width: '90%', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+            <h2 style={{ fontSize: 18, fontWeight: 600, margin: '0 0 8px' }}>Delete all candidates?</h2>
+            <p style={{ fontSize: 14, color: '#666', margin: '0 0 24px' }}>
+              This will permanently delete all candidates, scores, interview sessions, and messages. This cannot be undone.
+            </p>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setShowConfirm(false)}
+                style={{ padding: '8px 20px', border: '1px solid #ddd', borderRadius: 8, background: '#fff', fontSize: 14, cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={deleteAll}
+                disabled={deleting}
+                style={{ padding: '8px 20px', border: 'none', borderRadius: 8, background: '#dc2626', color: '#fff', fontSize: 14, cursor: 'pointer', opacity: deleting ? 0.6 : 1 }}
+              >
+                {deleting ? 'Deleting...' : 'Yes, delete all'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
