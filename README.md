@@ -54,6 +54,30 @@ Open [http://localhost:3000](http://localhost:3000)
 
 ---
 
+## Deployment
+
+### GitHub
+
+1. Create a new repository on [GitHub](https://github.com/new)
+2. Add the remote and push:
+   ```bash
+   git remote add origin https://github.com/your-username/your-repo.git
+   git push -u origin main
+   ```
+
+### Vercel
+
+1. Go to [Vercel](https://vercel.com) and sign in with GitHub
+2. Click "Import Project" and select your GitHub repository
+3. Configure environment variables in Vercel dashboard:
+   - `ANTHROPIC_API_KEY`
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+4. Deploy!
+
+---
+
 ## Architecture
 
 ```
