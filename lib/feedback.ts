@@ -65,7 +65,7 @@ export async function recalibrateWeights(): Promise<void> {
   // Compute mean scores per dimension for hired vs rejected
   const dims = ['skills_match', 'experience', 'communication', 'problem_solving', 'culture_fit', 'red_flags'] as const
 
-  function meanScores(group: typeof outcomes) {
+  function meanScores(group: NonNullable<typeof outcomes>) {
     const scores = group
       .map((o: any) => o.candidates?.scoring_results?.[0])
       .filter(Boolean)
